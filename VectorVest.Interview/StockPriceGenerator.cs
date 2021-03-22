@@ -9,7 +9,7 @@ namespace VectorVest.Interview
     {
 
         private readonly Random _random;
-        private readonly IEnumerable<int> _stocks;
+        private readonly List<string> _stocks;
 
         public delegate void StockPriceEventHandler(object sender, StockPriceEventArgs e);
         public event StockPriceEventHandler PriceUpdated;
@@ -17,7 +17,7 @@ namespace VectorVest.Interview
         public StockPriceGenerator()
         {
             _random = new Random();
-            _stocks = new List<int> { 1, 2, 3, 4, 5 };
+            _stocks = new List<string> { "AAPL", "MSFT", "GOOG", "IBM", "NFLX" };
         }
 
         public void Start()
@@ -28,14 +28,13 @@ namespace VectorVest.Interview
                 {
                     try
                     {
-                        var stockId = _random.Next(_stocks.First(), _stocks.Last());
+                        var stock = _random.Next(1, _stocks.Count());
                         var price = _random.Next(100, 200);
 
                         if (PriceUpdated is not null)
                         {
-                            PriceUpdated(this, new StockPriceEventArgs(new StockPrice(stockId, price)));
+                            PriceUpdated(this, new StockPriceEventArgs(_stocks[stock], price));
                         }
-
 
                         await Task.Delay(250);
                     }
@@ -50,23 +49,13 @@ namespace VectorVest.Interview
 
     public class StockPriceEventArgs : EventArgs
     {
-        public StockPriceEventArgs(StockPrice stockPrice)
+        public StockPriceEventArgs(string symbol, decimal price)
         {
-            StockPrice = stockPrice;
-        }
-
-        public StockPrice StockPrice { get; set; }
-    }
-
-    public class StockPrice
-    {
-        public StockPrice(int stockId, decimal price)
-        {
-            StockId = stockId;
+            Symbol = symbol;
             Price = price;
         }
 
-        public int StockId;
+        public string Symbol;
         public decimal Price;
     }
 }
